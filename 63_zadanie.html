@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Задание 63 — Список задач</title>
+<style>
+body{font:16px Arial,sans-serif;max-width:700px;margin:40px auto;padding:0 18px;color:#111}
+form{display:flex;gap:8px}input{flex:1;min-width:0;padding:10px}button{padding:9px 13px;cursor:pointer}
+li{display:flex;align-items:center;gap:10px;margin:12px 0;padding:10px;border:1px solid #ccc;border-radius:7px}
+li span{flex:1;overflow-wrap:anywhere}.done span{text-decoration:line-through;color:#666}
+</style>
+</head>
+<body>
+<h1>Список задач</h1>
+<form id="taskForm">
+  <input id="taskInput" type="text" maxlength="200" placeholder="Введите новую задачу" aria-label="Новая задача">
+  <button type="submit">Добавить</button>
+</form>
+<p id="message" aria-live="polite"></p>
+<ul id="taskList"></ul>
+<script>
+const form = document.getElementById("taskForm");
+const input = document.getElementById("taskInput");
+const list = document.getElementById("taskList");
+const message = document.getElementById("message");
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const text = input.value.trim();
+  if (!text) { message.textContent = "Введите текст задачи."; input.focus(); return; }
+  const item = document.createElement("li");
+  const done = document.createElement("input");
+  done.type = "checkbox"; done.setAttribute("aria-label", "Отметить задачу выполненной");
+  const label = document.createElement("span"); label.textContent = text;
+  const remove = document.createElement("button"); remove.type = "button"; remove.textContent = "Удалить";
+  done.addEventListener("change", () => item.classList.toggle("done", done.checked));
+  remove.addEventListener("click", () => item.remove());
+  item.append(done, label, remove); list.append(item);
+  input.value = ""; message.textContent = "Задача добавлена."; input.focus();
+});
+</script>
+</body>
+</html>

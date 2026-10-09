@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Задание 64 — Тест по JavaScript</title>
+<style>
+body{font:16px Arial,sans-serif;max-width:760px;margin:40px auto;padding:0 18px;color:#111}
+#answers{display:grid;gap:10px;margin:20px 0}button{padding:11px 14px;text-align:left;cursor:pointer}
+#next{display:none}#progress{color:#444}
+</style>
+</head>
+<body>
+<h1>Мини-тест по JavaScript</h1>
+<p id="progress"></p>
+<h2 id="question"></h2>
+<div id="answers"></div>
+<p id="feedback" aria-live="polite"></p>
+<button id="next" type="button">Следующий вопрос</button>
+<script>
+const questions = [
+  { question: "Как объявить переменную, значение которой можно менять?", options: ["const", "let", "fixed"], correct: 1 },
+  { question: "Какой оператор сравнивает значение и тип без преобразования типов?", options: ["=", "==", "==="], correct: 2 },
+  { question: "Как добавить элемент в конец массива?", options: ["push()", "pop()", "shift()"], correct: 0 },
+  { question: "Какой цикл обычно используют, когда известно число повторений?", options: ["for", "switch", "if"], correct: 0 },
+  { question: "Для чего нужна функция return?", options: ["Для вывода CSS", "Для возврата значения из функции", "Для остановки браузера"], correct: 1 }
+];
+let index = 0;
+let score = 0;
+let answered = false;
+const questionElement = document.getElementById("question");
+const answersElement = document.getElementById("answers");
+const progressElement = document.getElementById("progress");
+const feedbackElement = document.getElementById("feedback");
+const nextButton = document.getElementById("next");
+function renderQuestion() {
+  answered = false;
+  const current = questions[index];
+  progressElement.textContent = `Вопрос ${index + 1} из ${questions.length}`;
+  questionElement.textContent = current.question;
+  feedbackElement.textContent = "";
+  answersElement.replaceChildren();
+  nextButton.style.display = "none";
+  current.options.forEach((option, optionIndex) => {
+    const button = document.createElement("button");
+    button.type = "button"; button.textContent = option;
+    button.addEventListener("click", () => chooseAnswer(optionIndex));
+    answersElement.append(button);
+  });
+}
+function chooseAnswer(optionIndex) {
+  if (answered) return;
+  answered = true;
+  const correct = questions[index].correct;
+  if (optionIndex === correct) { score++; feedbackElement.textContent = "Верно!"; }
+  else { feedbackElement.textContent = `Неверно. Правильный ответ: ${questions[index].options[correct]}.`; }
+  [...answersElement.children].forEach(button => button.disabled = true);
+  nextButton.textContent = index === questions.length - 1 ? "Показать результат" : "Следующий вопрос";
+  nextButton.style.display = "inline-block";
+}
+nextButton.addEventListener("click", () => {
+  if (!answered) return;
+  index++;
+  if (index < questions.length) { renderQuestion(); return; }
+  const percent = Math.round(score / questions.length * 100);
+  progressElement.textContent = "Тест завершён";
+  questionElement.textContent = `Результат: ${score} из ${questions.length} (${percent}%).`;
+  answersElement.replaceChildren(); feedbackElement.textContent = "Вы прошли все вопросы.";
+  nextButton.style.display = "none";
+});
+renderQuestion();
+</script>
+</body>
+</html>

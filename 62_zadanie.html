@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Задание 62 — Средний балл</title>
+<style>
+body{font:16px Arial,sans-serif;max-width:620px;margin:40px auto;padding:0 18px;color:#111}
+label{display:block;margin:14px 0}input{display:block;box-sizing:border-box;width:100%;padding:9px;margin-top:5px}
+button{padding:10px 16px;cursor:pointer}#result{margin-top:18px;font-weight:bold}
+</style>
+</head>
+<body>
+<h1>Калькулятор среднего балла</h1>
+<form id="gradeForm">
+  <label>Предмет 1 (0–100)<input id="grade1" type="number" min="0" max="100" step="any" required></label>
+  <label>Предмет 2 (0–100)<input id="grade2" type="number" min="0" max="100" step="any" required></label>
+  <label>Предмет 3 (0–100)<input id="grade3" type="number" min="0" max="100" step="any" required></label>
+  <button type="submit">Рассчитать</button>
+</form>
+<p id="result" aria-live="polite"></p>
+<script>
+const form = document.getElementById("gradeForm");
+const result = document.getElementById("result");
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const grades = ["grade1", "grade2", "grade3"].map(id => Number(document.getElementById(id).value));
+  if (grades.some(value => !Number.isFinite(value) || value < 0 || value > 100)) {
+    result.textContent = "Ошибка: каждый балл должен быть от 0 до 100.";
+    return;
+  }
+  const average = grades.reduce((sum, value) => sum + value, 0) / grades.length;
+  let level;
+  if (average >= 90) level = "Отличная успеваемость";
+  else if (average >= 75) level = "Хорошая успеваемость";
+  else if (average >= 50) level = "Удовлетворительная успеваемость";
+  else level = "Нужно улучшить результат";
+  result.textContent = `Средний балл: ${average.toFixed(2)} из 100. ${level}.`;
+});
+</script>
+</body>
+</html>

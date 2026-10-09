@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Задание 61 — Счётчик</title>
+<style>
+body{font:16px Arial,sans-serif;max-width:620px;margin:40px auto;padding:0 18px;color:#111}
+.card{border:1px solid #bbb;border-radius:10px;padding:24px;text-align:center}
+#count{font-size:52px;margin:24px 0}button{font-size:18px;padding:10px 18px;margin:5px;cursor:pointer}
+</style>
+</head>
+<body>
+<h1>Интерактивный счётчик</h1>
+<div class="card">
+  <div id="count" aria-live="polite">0</div>
+  <button id="decrease" type="button">−</button>
+  <button id="increase" type="button">+</button>
+  <button id="reset" type="button">Сброс</button>
+</div>
+<script>
+let count = 0;
+const countElement = document.getElementById("count");
+function renderCount() { countElement.textContent = String(count); }
+document.getElementById("increase").addEventListener("click", () => { count++; renderCount(); });
+document.getElementById("decrease").addEventListener("click", () => { count--; renderCount(); });
+document.getElementById("reset").addEventListener("click", () => { count = 0; renderCount(); });
+</script>
+</body>
+</html>

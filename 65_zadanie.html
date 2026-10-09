@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Задание 65 — Посещаемость</title>
+<style>
+body{font:16px Arial,sans-serif;max-width:760px;margin:40px auto;padding:0 18px;color:#111}
+label.student{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #ddd}
+button{padding:10px 15px;margin-top:14px;cursor:pointer}#summary{margin-top:20px;line-height:1.7}
+</style>
+</head>
+<body>
+<h1>Электронная система посещаемости</h1>
+<label>Дата занятия: <input id="lessonDate" type="date"></label>
+<h2>Список студентов</h2>
+<div id="students"></div>
+<button id="submit" type="button">Подвести итог и сохранить</button>
+<button id="load" type="button">Загрузить сохранённый итог</button>
+<div id="summary" aria-live="polite"></div>
+<script>
+const studentNames = ["Алия", "Руслан", "Мадина", "Арман", "Данияр"];
+const storageKey = "attendance-results-v1";
+const studentsElement = document.getElementById("students");
+const dateInput = document.getElementById("lessonDate");
+const summaryElement = document.getElementById("summary");
+const today = new Date();
+const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+dateInput.value = localDate;
+studentNames.forEach((name, index) => {
+  const label = document.createElement("label"); label.className = "student";
+  const checkbox = document.createElement("input"); checkbox.type = "checkbox"; checkbox.id = `student-${index}`;
+  const text = document.createElement("span"); text.textContent = `${name} — присутствует`;
+  label.append(checkbox, text); studentsElement.append(label);
+});
+function calculateAttendance() {
+  if (!dateInput.value) { summaryElement.textContent = "Выберите дату занятия."; return; }
+  const attendees = studentNames.filter((_, index) => document.getElementById(`student-${index}`).checked);
+  const absent = studentNames.filter((_, index) => !document.getElementById(`student-${index}`).checked);
+  const percent = studentNames.length ? attendees.length / studentNames.length * 100 : 0;
+  const data = { date: dateInput.value, attendees, absent, total: studentNames.length, percent };
+  summaryElement.replaceChildren();
+  const lines = [
+    `Дата занятия: ${data.date}`,
+    `Всего студентов: ${data.total}`,
+    `Присутствуют: ${data.attendees.length}${data.attendees.length ? " — " + data.attendees.join(", ") : ""}`,
+    `Отсутствуют: ${data.absent.length}${data.absent.length ? " — " + data.absent.join(", ") : ""}`,
+    `Посещаемость: ${data.percent.toFixed(0)}%`
+  ];
+  for (const line of lines) { const p = document.createElement("p"); p.textContent = line; summaryElement.append(p); }
+  return data;
+}
+document.getElementById("submit").addEventListener("click", () => {
+  const data = calculateAttendance();
+  if (!data) return;
+  let records = [];
+  try { records = JSON.parse(localStorage.getItem(storageKey) || "[]"); if (!Array.isArray(records)) records = []; }
+  catch { records = []; }
+  records = records.filter(item => item.date !== data.date);
+  records.push(data);
+  try { localStorage.setItem(storageKey, JSON.stringify(records)); }
+  catch { summaryElement.append("Не удалось сохранить данные в localStorage."); }
+});
+document.getElementById("load").addEventListener("click", () => {
+  try {
+    const records = JSON.parse(localStorage.getItem(storageKey) || "[]");
+    const saved = Array.isArray(records) ? records.find(item => item.date === dateInput.value) : null;
+    if (!saved) { summaryElement.textContent = "Для выбранной даты сохранённых результатов нет."; return; }
+    studentNames.forEach((name, index) => {
+      document.getElementById(`student-${index}`).checked = saved.attendees.includes(name);
+    });
+    calculateAttendance();
+  } catch { summaryElement.textContent = "Не удалось прочитать сохранённые данные."; }
+});
+</script>
+</body>
+</html>
